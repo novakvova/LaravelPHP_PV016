@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { useFormik } from "formik";
 import qs from "qs";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -21,6 +22,7 @@ const HomePage = () => {
     //console.log("UseEffect Render app", search);
     GetProductList(search);
   }, [search]);
+
   const data = list.map((product) => (
     <tr key={product.id}>
       <td>{product.id}</td>
@@ -42,18 +44,47 @@ const HomePage = () => {
     <li key={page} className="page-item">
       <Link
         className={classNames("page-link", { active: current_page === page })}
-        onClick={()=> setSearch({...search, page})}
-        to={"?"+ qs.stringify(filterNonNull({...search, page}))}
+        onClick={() => setSearch({ ...search, page })}
+        to={"?" + qs.stringify(filterNonNull({ ...search, page }))}
       >
         {page}
       </Link>
     </li>
   ));
 
+  const onSubmit = (values: IProductSearch) => {
+    const filter = {...values, page:1};
+    setSearchParams(qs.stringify(filterNonNull(filter)));
+    setSearch(filter);
+  }
+  const formik = useFormik({
+    initialValues: search,
+    onSubmit: onSubmit,
+  }); 
+
+  const {handleSubmit, values, handleChange} = formik;
   return (
     <>
-      {console.log("Render app", "One render")}
       <h1 className="text-center">Головна сторінка</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label htmlFor="name" className="form-label">
+            Назва
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="name"
+            name="name"
+            onChange={handleChange}
+            value={values.name}
+          />
+        </div>
+        <button type="submit" className="btn btn-primary">
+          Пошук
+        </button>
+      </form>
+
       <h4>
         Усього продуктів <strong>{total}</strong>
       </h4>
