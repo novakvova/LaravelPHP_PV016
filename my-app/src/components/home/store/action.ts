@@ -4,7 +4,9 @@ import http from '../../../http_common';
 
 export const GetProductList = (search: IProductSearch) => async (dispatch: Dispatch<ProductActions>) => {
     try {
-        const resp = await http.get<IProductResponse>("/api/products");
+        const resp = await http.get<IProductResponse>("/api/products", {
+            params: search
+        });
         const {data} = resp;
         dispatch({
             type: ProductActionTypes.PRODUCT_LIST, 
